@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "PracticeADF-2026"
+		},
+		"ls_sql_server_incremental_load_password": {
+			"value": ""
+		},
+		"ls_target_increamental_load_password": {
+			"value": ""
+		},
+		"ls_sql_server_incremental_load_properties_typeProperties_server": {
+			"value": "az-sql-server-2025.database.windows.net"
+		},
+		"ls_sql_server_incremental_load_properties_typeProperties_database": {
+			"value": "source"
+		},
+		"ls_sql_server_incremental_load_properties_typeProperties_userName": {
+			"value": "mkubasad"
+		},
+		"ls_target_increamental_load_properties_typeProperties_server": {
+			"value": "az-sql-server-2025.database.windows.net"
+		},
+		"ls_target_increamental_load_properties_typeProperties_database": {
+			"value": "target"
+		},
+		"ls_target_increamental_load_properties_typeProperties_userName": {
+			"value": "mkubasad"
+		}
+	}
+}

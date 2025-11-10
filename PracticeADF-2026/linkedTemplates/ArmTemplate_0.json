@@ -1,0 +1,734 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PracticeADF-2026"
+		},
+		"ls_sql_server_incremental_load_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_sql_server_incremental_load'"
+		},
+		"ls_target_increamental_load_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'ls_target_increamental_load'"
+		},
+		"ls_sql_server_incremental_load_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "az-sql-server-2025.database.windows.net"
+		},
+		"ls_sql_server_incremental_load_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "source"
+		},
+		"ls_sql_server_incremental_load_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "mkubasad"
+		},
+		"ls_target_increamental_load_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "az-sql-server-2025.database.windows.net"
+		},
+		"ls_target_increamental_load_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "target"
+		},
+		"ls_target_increamental_load_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "mkubasad"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_sql_server_incremental_load')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ls_sql_server_incremental_load_properties_typeProperties_server')]",
+					"database": "[parameters('ls_sql_server_incremental_load_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ls_sql_server_incremental_load_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_sql_server_incremental_load_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_target_increamental_load')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('ls_target_increamental_load_properties_typeProperties_server')]",
+					"database": "[parameters('ls_target_increamental_load_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('ls_target_increamental_load_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('ls_target_increamental_load_password')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_get_timestamps_for_incremental_load')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sql_server_incremental_load",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_sql_server_incremental_load')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_source_tables_incremental_load')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sql_server_incremental_load",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"table_schema": {
+						"type": "string"
+					},
+					"table_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().table_schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_sql_server_incremental_load')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_target_copy_incremental_load')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_target_increamental_load",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"table_schema": {
+						"type": "string"
+					},
+					"table_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": {
+						"value": "@dataset().table_schema",
+						"type": "Expression"
+					},
+					"table": {
+						"value": "@dataset().table_name",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_target_increamental_load')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_full_load')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "LoopTables",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "create schema and tables",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.tablelist",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Full_load",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "insert",
+											"sqlWriterUseTableLock": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_source_tables_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {
+												"table_schema": {
+													"value": "@item().TableSchema",
+													"type": "Expression"
+												},
+												"table_name": {
+													"value": "@item().TableName",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_target_copy_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {
+												"table_schema": {
+													"value": "customload",
+													"type": "Expression"
+												},
+												"table_name": {
+													"value": "@item().TableName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "create schema and tables",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_target_increamental_load",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "Query",
+									"text": "DROP TABLE IF EXISTS CustomLoad.employees_last7;\nDROP TABLE IF EXISTS CustomLoad.iplteams_last7;\nDROP SCHEMA IF EXISTS CustomLoad;"
+								},
+								{
+									"type": "Query",
+									"text": "CREATE SCHEMA CustomLoad;"
+								},
+								{
+									"type": "Query",
+									"text": "CREATE TABLE CustomLoad.iplteams_last7 (\nid INT PRIMARY KEY,\nname NVARCHAR(100) NOT NULL,\nteam NVARCHAR(50) NOT NULL,\nscore INT NOT NULL,\nmatches_played INT NOT NULL,\nlast_updated DATETIME NOT NULL\n);\n\nCREATE TABLE CustomLoad.employees_last7 (\nid INT PRIMARY KEY,\nname NVARCHAR(100) NOT NULL,\ndep NVARCHAR(50) NOT NULL,\nsalary DECIMAL(10, 2) NOT NULL,\nlast_updated DATETIME NOT NULL\n);"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"tablelist": {
+						"type": "array",
+						"defaultValue": [
+							{
+								"TableName": "employees_last7",
+								"TableSchema": "dbo"
+							},
+							{
+								"TableName": "iplteams_last7",
+								"TableSchema": "dbo"
+							}
+						]
+					}
+				},
+				"folder": {
+					"name": "custom_load_Full_+_last_7_days"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-11-06T07:03:56Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_target_increamental_load')]",
+				"[concat(variables('factoryId'), '/datasets/ds_source_tables_incremental_load')]",
+				"[concat(variables('factoryId'), '/datasets/ds_target_copy_incremental_load')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_incremental_load')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Loop through tables for incremental load",
+						"description": "Loop through tables for incremental load.\nhere the table list is provided through getmetadata, can also be give through parameters",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "get table list",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('get table list').output.value",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "get_old_date",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT WatermarkValue as old_value FROM [dbo].[watermarktable] WHERE TableName = '@{item().TABLE_NAME}'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_get_timestamps_for_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "get_latest_date",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT MAX(last_updated) latest_value FROM @{concat(item().TABLE_SCHEMA,'.',item().TABLE_NAME)}",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_get_timestamps_for_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {}
+										}
+									}
+								},
+								{
+									"name": "Copy data incrementally",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "get_old_date",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "get_latest_date",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT * FROM @{concat(item().table_schema,'.',item().table_name)} where last_updated > '@{formatDateTime(activity('get_old_date').output.first_row.old_value)}' and last_updated <= '@{formatDateTime(activity('get_latest_date').output.first_row.latest_value)}'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"id"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_source_tables_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {
+												"table_schema": {
+													"value": "@item().TABLE_SCHEMA",
+													"type": "Expression"
+												},
+												"table_name": {
+													"value": "@item().TABLE_NAME",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_target_copy_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {
+												"table_schema": {
+													"value": "@item().TABLE_SCHEMA",
+													"type": "Expression"
+												},
+												"table_name": {
+													"value": "@item().TABLE_NAME",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Update_watermark_table",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "Copy data incrementally",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": "[[dbo].[usp_write_watermark]",
+										"storedProcedureParameters": {
+											"last_updated": {
+												"value": {
+													"value": "@{activity('get_latest_date').output.firstRow.latest_value}",
+													"type": "Expression"
+												},
+												"type": "DateTime"
+											},
+											"tableName": {
+												"value": {
+													"value": "@{item().TABLE_NAME}",
+													"type": "Expression"
+												},
+												"type": "String"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "ls_sql_server_incremental_load",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "get table list",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderQuery": "select TABLE_SCHEMA,TABLE_NAME from information_schema.tables where table_type = 'BASE TABLE' and TABLE_NAME <> 'watermarktable'",
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "ds_get_timestamps_for_incremental_load",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"firstRowOnly": false
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Incremental_load"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-11-03T05:48:59Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_get_timestamps_for_incremental_load')]",
+				"[concat(variables('factoryId'), '/datasets/ds_source_tables_incremental_load')]",
+				"[concat(variables('factoryId'), '/datasets/ds_target_copy_incremental_load')]",
+				"[concat(variables('factoryId'), '/linkedServices/ls_sql_server_incremental_load')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_load_last_7_days_data')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach1",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.tablelists",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "copy latest 7 days data",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "\nSELECT * FROM @{Concat(item().TableSchema,'.',item().TableName)}\nWHERE @{item().water_mark_value}>='@{formatDateTime(addDays(utcNow(),-7),'yyyy-MM-ddTHH:mm:ss')}'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "AzureSqlSink",
+											"preCopyScript": {
+												"value": "DELETE FROM @{Concat('CustomLoad','.',item().TableName)} WHERE @{item().water_mark_value}>='@{formatDateTime(addDays(utcNow(),-7),'yyyy-MM-ddTHH:mm:ss')}'",
+												"type": "Expression"
+											},
+											"writeBehavior": "upsert",
+											"upsertSettings": {
+												"useTempDB": true,
+												"keys": [
+													"id"
+												]
+											},
+											"sqlWriterUseTableLock": false,
+											"disableMetricsCollection": false
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ds_source_tables_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {
+												"table_schema": {
+													"value": "@item().TableSchema",
+													"type": "Expression"
+												},
+												"table_name": {
+													"value": "@item().TableName",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ds_target_copy_incremental_load",
+											"type": "DatasetReference",
+											"parameters": {
+												"table_schema": {
+													"value": "CustomLoad",
+													"type": "Expression"
+												},
+												"table_name": {
+													"value": "@item().TableName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"tablelists": {
+						"type": "array",
+						"defaultValue": [
+							{
+								"TableName": "employees_last7",
+								"TableSchema": "dbo",
+								"water_mark_value": "last_updated"
+							},
+							{
+								"TableName": "iplteams_last7",
+								"TableSchema": "dbo",
+								"water_mark_value": "last_updated"
+							}
+						]
+					}
+				},
+				"folder": {
+					"name": "custom_load_Full_+_last_7_days"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-11-06T09:56:14Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_source_tables_incremental_load')]",
+				"[concat(variables('factoryId'), '/datasets/ds_target_copy_incremental_load')]"
+			]
+		}
+	]
+}
