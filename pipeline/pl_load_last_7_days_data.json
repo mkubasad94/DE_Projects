@@ -1,0 +1,125 @@
+{
+	"name": "pl_load_last_7_days_data",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.tablelists",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "copy latest 7 days data",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "\nSELECT * FROM @{Concat(item().TableSchema,'.',item().TableName)}\nWHERE @{item().water_mark_value}>='@{formatDateTime(addDays(utcNow(),-7),'yyyy-MM-ddTHH:mm:ss')}'",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"preCopyScript": {
+										"value": "DELETE FROM @{Concat('CustomLoad','.',item().TableName)} WHERE @{item().water_mark_value}>='@{formatDateTime(addDays(utcNow(),-7),'yyyy-MM-ddTHH:mm:ss')}'",
+										"type": "Expression"
+									},
+									"writeBehavior": "upsert",
+									"upsertSettings": {
+										"useTempDB": true,
+										"keys": [
+											"id"
+										]
+									},
+									"sqlWriterUseTableLock": false,
+									"disableMetricsCollection": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_source_tables_incremental_load",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_schema": {
+											"value": "@item().TableSchema",
+											"type": "Expression"
+										},
+										"table_name": {
+											"value": "@item().TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_target_copy_incremental_load",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_schema": {
+											"value": "CustomLoad",
+											"type": "Expression"
+										},
+										"table_name": {
+											"value": "@item().TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"tablelists": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"TableName": "employees_last7",
+						"TableSchema": "dbo",
+						"water_mark_value": "last_updated"
+					},
+					{
+						"TableName": "iplteams_last7",
+						"TableSchema": "dbo",
+						"water_mark_value": "last_updated"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "custom_load_Full_+_last_7_days"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-11-06T09:56:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

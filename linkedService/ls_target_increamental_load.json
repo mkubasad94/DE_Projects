@@ -1,0 +1,17 @@
+{
+	"name": "ls_target_increamental_load",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "az-sql-server-2025.database.windows.net",
+			"database": "target",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "mkubasad",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQDJGOTAxN0M1LUFENTEtNENGMC04MEQ1LUZGNzVDRjU4N0JEQV8zNmE5MTMzZC0xMmJlLTQ0MzktOThlYi1lZTZiYmVkMTY3MDciDQp9"
+		}
+	}
+}

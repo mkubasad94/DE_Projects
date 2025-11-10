@@ -1,0 +1,9 @@
+{
+	"name": "PracticeADF-2026",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "eec2a3dc-edc4-47af-a0f2-a7bf35f43d29",
+		"tenantId": "44bfe01c-2829-4e84-a5df-a7c68e75ed43"
+	}
+}

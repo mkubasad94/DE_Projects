@@ -1,0 +1,13 @@
+{
+	"name": "ds_get_timestamps_for_incremental_load",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_server_incremental_load",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

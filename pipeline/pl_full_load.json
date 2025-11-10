@@ -1,0 +1,149 @@
+{
+	"name": "pl_full_load",
+	"properties": {
+		"activities": [
+			{
+				"name": "LoopTables",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "create schema and tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.tablelist",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Full_load",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "AzureSqlSink",
+									"writeBehavior": "insert",
+									"sqlWriterUseTableLock": false
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_source_tables_incremental_load",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_schema": {
+											"value": "@item().TableSchema",
+											"type": "Expression"
+										},
+										"table_name": {
+											"value": "@item().TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_target_copy_incremental_load",
+									"type": "DatasetReference",
+									"parameters": {
+										"table_schema": {
+											"value": "customload",
+											"type": "Expression"
+										},
+										"table_name": {
+											"value": "@item().TableName",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "create schema and tables",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_target_increamental_load",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "DROP TABLE IF EXISTS CustomLoad.employees_last7;\nDROP TABLE IF EXISTS CustomLoad.iplteams_last7;\nDROP SCHEMA IF EXISTS CustomLoad;"
+						},
+						{
+							"type": "Query",
+							"text": "CREATE SCHEMA CustomLoad;"
+						},
+						{
+							"type": "Query",
+							"text": "CREATE TABLE CustomLoad.iplteams_last7 (\nid INT PRIMARY KEY,\nname NVARCHAR(100) NOT NULL,\nteam NVARCHAR(50) NOT NULL,\nscore INT NOT NULL,\nmatches_played INT NOT NULL,\nlast_updated DATETIME NOT NULL\n);\n\nCREATE TABLE CustomLoad.employees_last7 (\nid INT PRIMARY KEY,\nname NVARCHAR(100) NOT NULL,\ndep NVARCHAR(50) NOT NULL,\nsalary DECIMAL(10, 2) NOT NULL,\nlast_updated DATETIME NOT NULL\n);"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"tablelist": {
+				"type": "array",
+				"defaultValue": [
+					{
+						"TableName": "employees_last7",
+						"TableSchema": "dbo"
+					},
+					{
+						"TableName": "iplteams_last7",
+						"TableSchema": "dbo"
+					}
+				]
+			}
+		},
+		"folder": {
+			"name": "custom_load_Full_+_last_7_days"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-11-06T07:03:56Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
