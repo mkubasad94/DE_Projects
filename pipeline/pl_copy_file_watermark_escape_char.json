@@ -50,7 +50,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_copy_file_watermark_escape_char",
+						"referenceName": "ds_source_copy_file_watermark_escape_char",
 						"type": "DatasetReference"
 					}
 				],
