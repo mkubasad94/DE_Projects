@@ -23,7 +23,8 @@
 					"dataset": {
 						"referenceName": "ds_lookup_sql_table",
 						"type": "DatasetReference"
-					}
+					},
+					"firstRowOnly": false
 				}
 			}
 		],
