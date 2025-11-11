@@ -20,7 +20,7 @@
 						"storeSettings": {
 							"type": "AzureBlobFSReadSettings",
 							"recursive": true,
-							"wildcardFileName": "xydata*for?copy.csv",
+							"wildcardFileName": "xydata*for?co*",
 							"enablePartitionDiscovery": false
 						},
 						"formatSettings": {
