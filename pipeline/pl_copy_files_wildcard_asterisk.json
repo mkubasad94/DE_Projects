@@ -1,9 +1,9 @@
 {
-	"name": "pl_copy_files_wildcard",
+	"name": "pl_copy_files_wildcard_asterisk",
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy files wild card",
+				"name": "Copy files wild card asterisk",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
