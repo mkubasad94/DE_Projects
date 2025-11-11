@@ -29,7 +29,8 @@
 					"dataset": {
 						"referenceName": "ds_lookup_adls",
 						"type": "DatasetReference"
-					}
+					},
+					"firstRowOnly": false
 				}
 			}
 		],
