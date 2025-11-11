@@ -1,0 +1,10 @@
+{
+	"name": "KV_Storage_Access_key",
+	"properties": {
+		"annotations": [],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kvdeproject.vault.azure.net/"
+		}
+	}
+}
