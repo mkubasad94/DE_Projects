@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "copy_files/copy_behaviour",
+				"folderPath": "copy_files/copy_behaviour/preserve_hierarchy",
 				"fileSystem": "target"
 			},
 			"columnDelimiter": ",",
