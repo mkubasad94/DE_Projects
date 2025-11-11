@@ -1,0 +1,19 @@
+{
+	"name": "ls_adls_gen2",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://adlsgen22026.dfs.core.windows.net",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "KV_Storage_Access_key",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "StorageAccessKey",
+				"secretVersion": "fb35da30fb454d28bc7c7416eb949795"
+			}
+		}
+	}
+}
