@@ -14,7 +14,7 @@
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
-			"schema": "foreachwithlist",
+			"schema": "ForeachWithLookupOp",
 			"table": {
 				"value": "@dataset().tablename",
 				"type": "Expression"
