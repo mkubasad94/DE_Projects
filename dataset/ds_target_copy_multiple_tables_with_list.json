@@ -1,0 +1,24 @@
+{
+	"name": "ds_target_copy_multiple_tables_with_list",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_target_db",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"tablename": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "foreachwithlist",
+			"table": {
+				"value": "@dataset().tablename",
+				"type": "Expression"
+			}
+		}
+	}
+}

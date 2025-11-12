@@ -1,0 +1,23 @@
+{
+	"name": "ls_target_db",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "az-sql-server-2025.database.windows.net",
+			"database": "target",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "mkubasad",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "KV_Storage_Access_key",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "SqlServerPassword"
+			}
+		}
+	}
+}
