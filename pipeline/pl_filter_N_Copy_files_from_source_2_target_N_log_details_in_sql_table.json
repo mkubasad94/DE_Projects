@@ -256,7 +256,44 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[LogPipelineDetails]",
+					"storedProcedureParameters": {
+						"CopiedFiles": {
+							"value": {
+								"value": "@variables('CopiedFiles')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"DataFactoryName": {
+							"value": {
+								"value": "@variables('DataFactoryName')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@variables('PipelineName')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@formatDateTime(variables('ExecutedTime'),'yyyy-MM-ddThh:mm:ss')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sql_server",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"variables": {
