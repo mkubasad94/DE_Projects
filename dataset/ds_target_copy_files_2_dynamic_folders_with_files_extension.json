@@ -1,0 +1,38 @@
+{
+	"name": "ds_target_copy_files_2_dynamic_folders_with_files_extension",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_adls_gen2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"FileName": {
+				"type": "String"
+			},
+			"FolderName": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@{concat(first(array(split(dataset().FileName,'.'))),'_',formatDateTime(utcNow(),'yyyyMMdd'),'.',last(array(split(dataset().FileName,'.'))))}",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "copy_files/WithFoldersAndExtension/@{first(array(split(dataset().FolderName,'.')))}",
+					"type": "Expression"
+				},
+				"fileSystem": "target"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

@@ -1,5 +1,5 @@
 {
-	"name": "pl_filter_N_Copy_files_from_source_2_target",
+	"name": "pl_filter_N_Copy_files_from_source_2_target_N_log_details_in_sql_table",
 	"properties": {
 		"activities": [
 			{
@@ -60,7 +60,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Filter files starting with emp and cust or data",
+						"activity": "TriggerTime",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -142,11 +142,174 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "CopiedFiles",
+							"type": "AppendVariable",
+							"dependsOn": [
+								{
+									"activity": "Copy filtered files",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "CopiedFiles",
+								"value": {
+									"value": "@item().name",
+									"type": "Expression"
+								}
+							}
 						}
 					]
 				}
+			},
+			{
+				"name": "DataFactoryName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Filter files starting with emp and cust or data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DataFactoryName",
+					"value": {
+						"value": "@pipeline().DataFactory",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "PipelineName",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "DataFactoryName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineName",
+					"value": {
+						"value": "@pipeline().Pipeline",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "TriggerTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "PipelineName",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "ExecutedTime",
+					"value": {
+						"value": "@pipeline().TriggerTime",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "LogPipelineDetails",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Foreach for filtered files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[dbo].[LogPipelineDetails]",
+					"storedProcedureParameters": {
+						"CopiedFiles": {
+							"value": {
+								"value": "@join(variables('CopiedFiles'),',')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"DataFactoryName": {
+							"value": {
+								"value": "@variables('DataFactoryName')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineName": {
+							"value": {
+								"value": "@variables('PipelineName')",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"TriggerTime": {
+							"value": {
+								"value": "@formatDateTime(variables('ExecutedTime'),'yyyy-MM-ddThh:mm:ss')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sql_server",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
+		"variables": {
+			"PipelineName": {
+				"type": "String"
+			},
+			"DataFactoryName": {
+				"type": "String"
+			},
+			"ExecutedTime": {
+				"type": "String"
+			},
+			"CopiedFiles": {
+				"type": "Array"
+			}
+		},
 		"folder": {
 			"name": "Filter_N_Logging_using_system_variables"
 		},

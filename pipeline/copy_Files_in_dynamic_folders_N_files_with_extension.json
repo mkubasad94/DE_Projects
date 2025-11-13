@@ -1,32 +1,9 @@
 {
-	"name": "pl_filter_N_Copy_files_from_source_2_target",
+	"name": "copy_Files_in_dynamic_folders_N_files_with_extension",
 	"properties": {
 		"activities": [
 			{
-				"name": "Filter files starting with emp and cust or data",
-				"type": "Filter",
-				"dependsOn": [
-					{
-						"activity": "Get Metadata of source folder",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Get Metadata of source folder').output.childItems",
-						"type": "Expression"
-					},
-					"condition": {
-						"value": "@and(or(or(startswith(item().name,'emp'),startswith(item().name,'cust')),contains(item().name,'data')),equals(item().type,'File'))",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Get Metadata of source folder",
+				"name": "Get Metadata",
 				"type": "GetMetadata",
 				"dependsOn": [],
 				"policy": {
@@ -47,7 +24,6 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
@@ -56,11 +32,11 @@
 				}
 			},
 			{
-				"name": "Foreach for filtered files",
+				"name": "ForEach",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Filter files starting with emp and cust or data",
+						"activity": "Get Metadata",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -69,12 +45,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Filter files starting with emp and cust or data').output.Value",
+						"value": "@activity('Get Metadata').output.childItems",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "Copy filtered files",
+							"name": "Copy files",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -120,10 +96,10 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ds_source_copy_filtered_files",
+									"referenceName": "ds_source_copy_files_dynamica_folder_with_file_extension",
 									"type": "DatasetReference",
 									"parameters": {
-										"filename": {
+										"FileName": {
 											"value": "@item().name",
 											"type": "Expression"
 										}
@@ -132,10 +108,14 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_target_copy_filtered_files",
+									"referenceName": "ds_target_copy_files_2_dynamic_folders_with_files_extension",
 									"type": "DatasetReference",
 									"parameters": {
-										"filename": {
+										"FileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
+										"FolderName": {
 											"value": "@item().name",
 											"type": "Expression"
 										}
@@ -148,7 +128,7 @@
 			}
 		],
 		"folder": {
-			"name": "Filter_N_Logging_using_system_variables"
+			"name": "copy_Files_in_seperate_folders_with_extension"
 		},
 		"annotations": []
 	}
