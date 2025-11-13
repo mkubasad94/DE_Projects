@@ -19,7 +19,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@{dataset().FileName}_'@{formatDateTime(utcNow(),'yyyyMMdd')}'\n",
+					"value": "@{first(array(split(dataset().FileName,'.')))}_'@{formatDateTime(utcNow(),'yyyyMMdd')}'.{last(array(split(dataset().FileName,'.')))}\n",
 					"type": "Expression"
 				},
 				"folderPath": {
