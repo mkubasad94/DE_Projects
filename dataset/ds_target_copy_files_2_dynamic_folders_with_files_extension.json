@@ -23,7 +23,7 @@
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "copy_files/WithFoldersAndExtension/{@dataset().FolderName}",
+					"value": "copy_files/WithFoldersAndExtension/'@{dataset().FolderName}'",
 					"type": "Expression"
 				},
 				"fileSystem": "target"
