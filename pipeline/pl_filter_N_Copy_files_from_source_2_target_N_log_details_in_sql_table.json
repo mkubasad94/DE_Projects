@@ -1,5 +1,5 @@
 {
-	"name": "pl_filter_N_Copy_files_from_source_2_target",
+	"name": "pl_filter_N_Copy_files_from_source_2_target_N_log_details_in_sql_table",
 	"properties": {
 		"activities": [
 			{
@@ -147,6 +147,20 @@
 				}
 			}
 		],
+		"variables": {
+			"PipelineName": {
+				"type": "String"
+			},
+			"DataFactoryName": {
+				"type": "String"
+			},
+			"ExecutedTime": {
+				"type": "String"
+			},
+			"CopiedFiles": {
+				"type": "Array"
+			}
+		},
 		"folder": {
 			"name": "Filter_N_Logging_using_system_variables"
 		},
