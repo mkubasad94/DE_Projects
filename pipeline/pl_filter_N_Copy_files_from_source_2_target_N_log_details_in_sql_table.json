@@ -262,7 +262,7 @@
 					"storedProcedureParameters": {
 						"CopiedFiles": {
 							"value": {
-								"value": "@string(variables('CopiedFiles'))",
+								"value": "@join(variables('CopiedFiles'),',')",
 								"type": "Expression"
 							},
 							"type": "String"
