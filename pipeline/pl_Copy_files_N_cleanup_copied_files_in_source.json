@@ -216,8 +216,14 @@
 							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
-									"referenceName": "ds_getmetadata_folder",
-									"type": "DatasetReference"
+									"referenceName": "ds_delete_copied_files_from_source",
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": {
+											"value": "@item().name",
+											"type": "Expression"
+										}
+									}
 								},
 								"logStorageSettings": {
 									"linkedServiceName": {
