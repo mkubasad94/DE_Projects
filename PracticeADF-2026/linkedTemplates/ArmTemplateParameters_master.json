@@ -17,6 +17,15 @@
 		"ls_adls_gen2_properties_typeProperties_url": {
 			"value": "https://adlsgen22026.dfs.core.windows.net"
 		},
+		"ls_sql_server_properties_typeProperties_server": {
+			"value": "az-sql-server-2025.database.windows.net"
+		},
+		"ls_sql_server_properties_typeProperties_database": {
+			"value": "source"
+		},
+		"ls_sql_server_properties_typeProperties_userName": {
+			"value": "mkubasad"
+		},
 		"ls_sql_server_incremental_load_properties_typeProperties_server": {
 			"value": "az-sql-server-2025.database.windows.net"
 		},
@@ -24,6 +33,15 @@
 			"value": "source"
 		},
 		"ls_sql_server_incremental_load_properties_typeProperties_userName": {
+			"value": "mkubasad"
+		},
+		"ls_target_db_properties_typeProperties_server": {
+			"value": "az-sql-server-2025.database.windows.net"
+		},
+		"ls_target_db_properties_typeProperties_database": {
+			"value": "target"
+		},
+		"ls_target_db_properties_typeProperties_userName": {
 			"value": "mkubasad"
 		},
 		"ls_target_increamental_load_properties_typeProperties_server": {
