@@ -1,5 +1,5 @@
 {
-	"name": "pl_Copy_folder_only_passing_multiple_values_from_an_actiity",
+	"name": "pl_Copy_files_N_cleanup_copied_files_in_source",
 	"properties": {
 		"activities": [
 			{
@@ -38,7 +38,7 @@
 				"type": "SetVariable",
 				"dependsOn": [
 					{
-						"activity": "Get Metadata",
+						"activity": "Filter_files_with_cust_keyword",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -71,7 +71,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@activity('Get Metadata').output.childItems",
+						"value": "@activity('Filter_files_with_cust_keyword').output.Value",
 						"type": "Expression"
 					},
 					"activities": [
@@ -194,8 +194,70 @@
 									}
 								}
 							]
+						},
+						{
+							"name": "Delete copied_files_ from_source",
+							"type": "Delete",
+							"dependsOn": [
+								{
+									"activity": "LogCopyFileDetails",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_getmetadata_folder",
+									"type": "DatasetReference"
+								},
+								"logStorageSettings": {
+									"linkedServiceName": {
+										"referenceName": "ls_adls_gen2",
+										"type": "LinkedServiceReference"
+									},
+									"path": "source/Logs/deleted_file_details"
+								},
+								"enableLogging": true,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Filter_files_with_cust_keyword",
+				"type": "Filter",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Get Metadata').output.childItems",
+						"type": "Expression"
+					},
+					"condition": {
+						"value": "@contains(item().name,'cust' )",
+						"type": "Expression"
+					}
 				}
 			}
 		],
