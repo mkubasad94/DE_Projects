@@ -1,5 +1,5 @@
 {
-	"name": "copy_Files_in_dynamic_folders_N_files_with_extension",
+	"name": "pl_Copy_folder_only_passing_multiple_values_from_an_actiity",
 	"properties": {
 		"activities": [
 			{
@@ -20,7 +20,8 @@
 						"type": "DatasetReference"
 					},
 					"fieldList": [
-						"childItems"
+						"childItems",
+						"exists"
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
@@ -33,11 +34,35 @@
 				}
 			},
 			{
+				"name": "exists",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Metadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "exists",
+					"value": {
+						"value": "@activity('Get Metadata').output.exists",
+						"type": "Expression"
+					}
+				}
+			},
+			{
 				"name": "ForEach",
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "Get Metadata",
+						"activity": "exists",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -51,7 +76,57 @@
 					},
 					"activities": [
 						{
-							"name": "Copy files",
+							"name": "LogCopyFileDetails",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "CopyFiles",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[dbo].[LogCopyFileDetails]",
+								"storedProcedureParameters": {
+									"exists": {
+										"value": {
+											"value": "@variables('exists')",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"FileName": {
+										"value": {
+											"value": "@item().name",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"FileType": {
+										"value": {
+											"value": "@item().type",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_sql_server",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "CopyFiles",
 							"type": "Copy",
 							"dependsOn": [],
 							"policy": {
@@ -97,10 +172,10 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ds_source_copy_files_dynamica_folder_with_file_extension",
+									"referenceName": "ds_source_copyfiles_pass_multiple_values_from_1_activity",
 									"type": "DatasetReference",
 									"parameters": {
-										"FileName": {
+										"filename": {
 											"value": "@item().name",
 											"type": "Expression"
 										}
@@ -109,14 +184,10 @@
 							],
 							"outputs": [
 								{
-									"referenceName": "ds_target_copy_files_2_dynamic_folders_with_files_extension",
+									"referenceName": "ds_target_copyfiles_pass_multiple_values_from_1_activity",
 									"type": "DatasetReference",
 									"parameters": {
-										"FileName": {
-											"value": "@item().name",
-											"type": "Expression"
-										},
-										"FolderName": {
+										"filename": {
 											"value": "@item().name",
 											"type": "Expression"
 										}
@@ -128,8 +199,14 @@
 				}
 			}
 		],
+		"variables": {
+			"exists": {
+				"type": "Boolean",
+				"defaultValue": false
+			}
+		},
 		"folder": {
-			"name": "copy_Files_in_seperate_folders_with_extension"
+			"name": "Pass_multiple_values_from_1_activity_N_cleanup_folder"
 		},
 		"annotations": []
 	}
