@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "copy_files/switch_N_fail",
+				"folderPath": "copy_files/switch_N_fail/sales",
 				"fileSystem": "target"
 			},
 			"columnDelimiter": ",",
