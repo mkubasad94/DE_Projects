@@ -1,5 +1,5 @@
 {
-	"name": "ds_target_copy_employee_files",
+	"name": "ds_target_copy_sales_files",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_adls_gen2",
@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"folderPath": "copy_files/switch_N_fail/employee",
+				"folderPath": "copy_file/switch_N_fail/sales",
 				"fileSystem": "target"
 			},
 			"columnDelimiter": ",",

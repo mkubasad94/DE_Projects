@@ -134,7 +134,7 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "ds_target_copy_employee_files",
+											"referenceName": "ds_target_copy_sales_files",
 											"type": "DatasetReference"
 										}
 									]
