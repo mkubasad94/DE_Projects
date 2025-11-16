@@ -205,6 +205,18 @@
 								}
 							]
 						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Custom Fail",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Mentioned dept not found",
+								"errorCode": "Error 404"
+							}
+						}
 					]
 				}
 			}
