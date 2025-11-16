@@ -98,6 +98,10 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
+								"expression": {
+									"value": "@greaterOrEquals(activity('Get Metadata each file').output.lastModified,addminutes(utcNow(),-30))",
+									"type": "Expression"
+								},
 								"ifTrueActivities": [
 									{
 										"name": "Copy_last_30min_old_files",
@@ -150,7 +154,7 @@
 												"type": "DatasetReference",
 												"parameters": {
 													"fileName": {
-														"value": "@item().name",
+														"value": "@activity('Get Metadata each file').output.itemName",
 														"type": "Expression"
 													}
 												}
@@ -159,7 +163,13 @@
 										"outputs": [
 											{
 												"referenceName": "ds_target_copy_last_30min_old_files",
-												"type": "DatasetReference"
+												"type": "DatasetReference",
+												"parameters": {
+													"filename": {
+														"value": "@item().name",
+														"type": "Expression"
+													}
+												}
 											}
 										]
 									}
