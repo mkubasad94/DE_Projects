@@ -56,7 +56,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
-									"value": "@equals(activity('Lookup_refresh_column').firstRow.RefreshStatus,true)",
+									"value": "@equals(activity('Lookup_refresh_column').output.firstRow.RefreshStatus,true)\n",
 									"type": "Expression"
 								},
 								"ifTrueActivities": [
@@ -78,7 +78,7 @@
 							}
 						}
 					],
-					"timeout": "0.12:00:00"
+					"timeout": "00:05:00"
 				}
 			}
 		],
