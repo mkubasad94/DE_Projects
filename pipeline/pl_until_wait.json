@@ -5,14 +5,7 @@
 			{
 				"name": "Lookup_refresh_column",
 				"type": "Lookup",
-				"dependsOn": [
-					{
-						"activity": "Wait",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -59,7 +52,14 @@
 						{
 							"name": "If Condition1",
 							"type": "IfCondition",
-							"dependsOn": [],
+							"dependsOn": [
+								{
+									"activity": "Wait",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
 							"userProperties": [],
 							"typeProperties": {
 								"expression": {
@@ -83,18 +83,18 @@
 									}
 								]
 							}
+						},
+						{
+							"name": "Wait",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 10
+							}
 						}
 					],
 					"timeout": "00:05:00"
-				}
-			},
-			{
-				"name": "Wait",
-				"type": "Wait",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"waitTimeInSeconds": 10
 				}
 			}
 		],
