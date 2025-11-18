@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Lookup_table_names",
+				"name": "Lookup_refresh_column",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -18,7 +18,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT TABLE_NAME,TABLE_SCHEMA  FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'dbo'",
+							"value": "SELECT RefreshStatus FROM TableRereshStatus WHERE TableName = 'employees'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -28,15 +28,15 @@
 						"referenceName": "ds_lookup_sql_table",
 						"type": "DatasetReference"
 					},
-					"firstRowOnly": false
+					"firstRowOnly": true
 				}
 			},
 			{
-				"name": "ForEach",
-				"type": "ForEach",
+				"name": "Until",
+				"type": "Until",
 				"dependsOn": [
 					{
-						"activity": "Lookup_table_names",
+						"activity": "Lookup_refresh_column",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -44,73 +44,50 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"items": {
-						"value": "@activity('Lookup_table_names').output.value",
+					"expression": {
+						"value": "@variables('until_var')",
 						"type": "Expression"
 					},
 					"activities": [
 						{
-							"name": "Until",
-							"type": "Until",
-							"dependsOn": [
-								{
-									"activity": "Lookup_refresh_column_for_each_table",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
+							"name": "If Condition1",
+							"type": "IfCondition",
+							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"activities": [
+								"expression": {
+									"value": "@equals(activity('Lookup_refresh_column').firstRow.RefreshStatus,true)",
+									"type": "Expression"
+								},
+								"ifTrueActivities": [
 									{
-										"name": "If Condition1",
-										"type": "IfCondition",
+										"name": "Set RefreshStatus",
+										"type": "SetVariable",
 										"dependsOn": [],
+										"policy": {
+											"secureOutput": false,
+											"secureInput": false
+										},
 										"userProperties": [],
 										"typeProperties": {
-											"expression": {
-												"value": "@equals(activity('Lookup_refresh_column_for_each_table').output.firstRow.RefreshStatus,true)\n",
-												"type": "Expression"
-											}
+											"variableName": "until_var",
+											"value": true
 										}
 									}
-								],
-								"timeout": "0.12:00:00"
-							}
-						},
-						{
-							"name": "Lookup_refresh_column_for_each_table",
-							"type": "Lookup",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"source": {
-									"type": "AzureSqlSource",
-									"sqlReaderQuery": {
-										"value": "SELECT RefreshStatus FROM TableRereshStatus WHERE TableName = '@{item().TABLE_NAME}'",
-										"type": "Expression"
-									},
-									"queryTimeout": "02:00:00",
-									"partitionOption": "None"
-								},
-								"dataset": {
-									"referenceName": "ds_lookup_sql_table",
-									"type": "DatasetReference"
-								}
+								]
 							}
 						}
-					]
+					],
+					"timeout": "0.12:00:00"
 				}
 			}
 		],
+		"variables": {
+			"until_var": {
+				"type": "Boolean",
+				"defaultValue": false
+			}
+		},
 		"folder": {
 			"name": "until_wait"
 		},
