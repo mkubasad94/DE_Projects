@@ -44,6 +44,10 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup_table_names').output.value",
+						"type": "Expression"
+					},
 					"activities": [
 						{
 							"name": "Until",
@@ -58,6 +62,20 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
+								"activities": [
+									{
+										"name": "If Condition1",
+										"type": "IfCondition",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"expression": {
+												"value": "@equals(activity('Lookup_refresh_column_for_each_table').output.firstRow.RefreshStatus,true)\n",
+												"type": "Expression"
+											}
+										}
+									}
+								],
 								"timeout": "0.12:00:00"
 							}
 						},
