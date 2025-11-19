@@ -56,7 +56,7 @@
 								{
 									"name": "Demotable",
 									"type": "String",
-									"value": "iplteams_demo",
+									"value": "ipl_team_demo",
 									"direction": "Input"
 								},
 								{
@@ -67,7 +67,7 @@
 								}
 							],
 							"type": "NonQuery",
-							"text": "SELECT * INTO @Demotable FROM FROM @tablename"
+							"text": "SELECT * INTO @Demotable FROM @tablename"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
