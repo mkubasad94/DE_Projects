@@ -12,7 +12,7 @@
 						"referenceName": "ds_validation",
 						"type": "DatasetReference"
 					},
-					"timeout": "0:05:00",
+					"timeout": "00:05:00",
 					"sleep": 10,
 					"childItems": true
 				}
