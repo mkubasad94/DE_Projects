@@ -26,12 +26,14 @@
 								{
 									"name": "MinSalary",
 									"type": "Double",
-									"value": "10000"
+									"value": "10000",
+									"direction": "Input"
 								},
 								{
 									"name": "MaxSalary",
 									"type": "Double",
-									"value": "60000"
+									"value": "60000",
+									"direction": "Input"
 								}
 							],
 							"type": "Query",
@@ -42,7 +44,8 @@
 								{
 									"name": "Team",
 									"type": "String",
-									"value": "Rcb"
+									"value": "Rcb",
+									"direction": "Input"
 								}
 							],
 							"type": "Query",
@@ -53,12 +56,14 @@
 								{
 									"name": "Demotable",
 									"type": "String",
-									"value": "iplteams_demo"
+									"value": "iplteams_demo",
+									"direction": "Input"
 								},
 								{
 									"name": "tablename",
 									"type": "String",
-									"value": "iplteams"
+									"value": "iplteams",
+									"direction": "Input"
 								}
 							],
 							"type": "NonQuery",
