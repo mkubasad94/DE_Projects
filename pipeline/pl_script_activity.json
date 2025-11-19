@@ -52,22 +52,8 @@
 							"text": "SELECT * FROM [dbo].[iplteams] WHERE team = @Team"
 						},
 						{
-							"parameters": [
-								{
-									"name": "Demotable",
-									"type": "String",
-									"value": "ipl_team_demo",
-									"direction": "Input"
-								},
-								{
-									"name": "tablename",
-									"type": "String",
-									"value": "iplteams",
-									"direction": "Input"
-								}
-							],
-							"type": "Query",
-							"text": "SELECT * INTO @Demotable FROM @tablename"
+							"type": "NonQuery",
+							"text": "SELECT * INTO Demoiplteams FROM iplteams"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
