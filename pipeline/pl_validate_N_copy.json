@@ -1,0 +1,45 @@
+{
+	"name": "pl_validate_N_copy",
+	"properties": {
+		"activities": [
+			{
+				"name": "Validation_car_sales_files",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_validation",
+						"type": "DatasetReference"
+					},
+					"timeout": "0:05:00",
+					"sleep": 10,
+					"childItems": true
+				}
+			},
+			{
+				"name": "Execute Pipeline1",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Validation_car_sales_files",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"folder": {
+			"name": "Validation"
+		},
+		"annotations": []
+	}
+}
