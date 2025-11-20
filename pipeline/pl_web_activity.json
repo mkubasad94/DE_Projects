@@ -24,7 +24,7 @@
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Web",
+						"activity": "Set variable1",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -67,7 +67,7 @@
 						"formatSettings": {
 							"type": "DelimitedTextWriteSettings",
 							"quoteAllText": true,
-							"fileExtension": ".txt"
+							"fileExtension": ".json"
 						}
 					},
 					"enableStaging": false,
@@ -105,8 +105,30 @@
 						"type": "DatasetReference"
 					}
 				]
+			},
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Web",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": []
 			}
 		],
+		"variables": {
+			"web_op": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Validation_Script_N_WebActivity"
 		},
