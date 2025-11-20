@@ -13,6 +13,401 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_copy_file_watermark_escape_char')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_file_watermark_escape_char",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFileName": "xydata^*for^?co*",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_source_copy_file_watermark_escape_char",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_files_wildcard_escape_char",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "copy files"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_copy_files')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy file",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_source_copy_file",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_files",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "copy files"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_copy_files_copy_behaviour_flatten')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_files_copy_behaviour_flatten",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "with_hierarchy",
+									"wildcardFileName": "*",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "FlattenHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_source_copy_files_copy_behaviour_flatten",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_files_copy_behaviour_flatten",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "copy files"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_copy_files_copy_behaviour_merge_files')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_files_copy_behaviour_merge_files",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "with_hierarchy",
+									"wildcardFileName": "*",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "MergeFiles"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_source_copy_files_copy_behaviour_merge_files",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_files_copy_behaviour_merge_files",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "copy files"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_copy_files_copy_behaviour_preserve_hierarchy')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "copy_files_copy_behaviour_preserve_hierarchy",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "with_hierarchy",
+									"wildcardFileName": "*",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_source_copy_files_copy_behaviour_preserve_hierarchy",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_files_copy_behaviour_preserve_hierarchy",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "copy files"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_copy_files_greater_than_5kb')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -2024,304 +2419,6 @@
 				"annotations": []
 			},
 			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_until')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Until",
-						"type": "Until",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@variables('until_var')",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "If Condition1",
-									"type": "IfCondition",
-									"dependsOn": [
-										{
-											"activity": "Lookup_refresh_column",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@equals(activity('Lookup_refresh_column').output.firstRow.RefreshStatus,true)\n",
-											"type": "Expression"
-										},
-										"ifTrueActivities": [
-											{
-												"name": "Set RefreshStatus",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "until_var",
-													"value": true
-												}
-											}
-										]
-									}
-								},
-								{
-									"name": "Lookup_refresh_column",
-									"type": "Lookup",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT RefreshStatus FROM TableRereshStatus WHERE TableName = 'employees'",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "ds_lookup_sql_table",
-											"type": "DatasetReference",
-											"parameters": {}
-										},
-										"firstRowOnly": true
-									}
-								}
-							],
-							"timeout": "00:05:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"until_var": {
-						"type": "Boolean",
-						"defaultValue": false
-					}
-				},
-				"folder": {
-					"name": "until_wait"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_until_wait')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "Until",
-						"type": "Until",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@variables('until_var')",
-								"type": "Expression"
-							},
-							"activities": [
-								{
-									"name": "If Condition1",
-									"type": "IfCondition",
-									"dependsOn": [
-										{
-											"activity": "Lookup_refresh_column",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"userProperties": [],
-									"typeProperties": {
-										"expression": {
-											"value": "@equals(activity('Lookup_refresh_column').output.firstRow.RefreshStatus,true)\n",
-											"type": "Expression"
-										},
-										"ifTrueActivities": [
-											{
-												"name": "Set RefreshStatus",
-												"type": "SetVariable",
-												"dependsOn": [],
-												"policy": {
-													"secureOutput": false,
-													"secureInput": false
-												},
-												"userProperties": [],
-												"typeProperties": {
-													"variableName": "until_var",
-													"value": true
-												}
-											}
-										]
-									}
-								},
-								{
-									"name": "Wait",
-									"type": "Wait",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"waitTimeInSeconds": 10
-									}
-								},
-								{
-									"name": "Lookup_refresh_column",
-									"type": "Lookup",
-									"dependsOn": [
-										{
-											"activity": "Wait",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"sqlReaderQuery": {
-												"value": "SELECT RefreshStatus FROM TableRereshStatus WHERE TableName = 'employees'",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"partitionOption": "None"
-										},
-										"dataset": {
-											"referenceName": "ds_lookup_sql_table",
-											"type": "DatasetReference",
-											"parameters": {}
-										},
-										"firstRowOnly": true
-									}
-								}
-							],
-							"timeout": "00:05:00"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"variables": {
-					"until_var": {
-						"type": "Boolean",
-						"defaultValue": false
-					}
-				},
-				"folder": {
-					"name": "until_wait"
-				},
-				"annotations": []
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/pl_if_condition_copy_tables_N_Files')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"activities": [
-					{
-						"name": "If Condition1",
-						"type": "IfCondition",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(pipeline().parameters.ObjectType,'files')",
-								"type": "Expression"
-							},
-							"ifFalseActivities": [
-								{
-									"name": "copy tables",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pl_copy_multiple_sql_tables_using_Lookup_Op",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {}
-									}
-								}
-							],
-							"ifTrueActivities": [
-								{
-									"name": "copy files",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"policy": {
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "pl_copy_files_wildcard_asterisk",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {}
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"ObjectType": {
-						"type": "string",
-						"defaultValue": "files"
-					}
-				},
-				"folder": {
-					"name": "IF_condition"
-				},
-				"annotations": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/pl_copy_multiple_sql_tables_using_Lookup_Op')]",
-				"[concat(variables('factoryId'), '/pipelines/pl_copy_files_wildcard_asterisk')]"
-			]
 		}
 	]
 }

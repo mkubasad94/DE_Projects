@@ -1,0 +1,567 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "PracticeADF-2026"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_until')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Until",
+						"type": "Until",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@variables('until_var')",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Lookup_refresh_column",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(activity('Lookup_refresh_column').output.firstRow.RefreshStatus,true)\n",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Set RefreshStatus",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "until_var",
+													"value": true
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "Lookup_refresh_column",
+									"type": "Lookup",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT RefreshStatus FROM TableRereshStatus WHERE TableName = 'employees'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_lookup_sql_table",
+											"type": "DatasetReference",
+											"parameters": {}
+										},
+										"firstRowOnly": true
+									}
+								}
+							],
+							"timeout": "00:05:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"until_var": {
+						"type": "Boolean",
+						"defaultValue": false
+					}
+				},
+				"folder": {
+					"name": "until_wait"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_until_wait')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Until",
+						"type": "Until",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@variables('until_var')",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "If Condition1",
+									"type": "IfCondition",
+									"dependsOn": [
+										{
+											"activity": "Lookup_refresh_column",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"expression": {
+											"value": "@equals(activity('Lookup_refresh_column').output.firstRow.RefreshStatus,true)\n",
+											"type": "Expression"
+										},
+										"ifTrueActivities": [
+											{
+												"name": "Set RefreshStatus",
+												"type": "SetVariable",
+												"dependsOn": [],
+												"policy": {
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"variableName": "until_var",
+													"value": true
+												}
+											}
+										]
+									}
+								},
+								{
+									"name": "Wait",
+									"type": "Wait",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 10
+									}
+								},
+								{
+									"name": "Lookup_refresh_column",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Wait",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "SELECT RefreshStatus FROM TableRereshStatus WHERE TableName = 'employees'",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "ds_lookup_sql_table",
+											"type": "DatasetReference",
+											"parameters": {}
+										},
+										"firstRowOnly": true
+									}
+								}
+							],
+							"timeout": "00:05:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"until_var": {
+						"type": "Boolean",
+						"defaultValue": false
+					}
+				},
+				"folder": {
+					"name": "until_wait"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_validate_N_copy')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Validation_car_sales_files",
+						"type": "Validation",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_validation",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"timeout": "00:05:00",
+							"sleep": 10,
+							"childItems": true
+						}
+					},
+					{
+						"name": "Copy files",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Validation_car_sales_files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "Data_with_hierarchy",
+									"wildcardFileName": "*",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_validation",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_files_validation",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Validation_Script_N_WebActivity"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_web_activity')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://dummy.restapiexample.com/api/v1/employees"
+						}
+					},
+					{
+						"name": "Copy web data",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set webdata",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"additionalColumns": [
+									{
+										"name": "web_data",
+										"value": {
+											"value": "@variables('web_op')",
+											"type": "Expression"
+										}
+									}
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".json"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "web_data",
+											"type": "String"
+										},
+										"sink": {
+											"type": "String",
+											"physicalType": "String",
+											"ordinal": 1
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_dummy_for_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_web_data",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Set webdata",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Web",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "web_op",
+							"value": {
+								"value": "@string(activity('Web').output)",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"web_op": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Validation_Script_N_WebActivity"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_if_condition_copy_tables_N_Files')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "If Condition1",
+						"type": "IfCondition",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(pipeline().parameters.ObjectType,'files')",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "copy tables",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_copy_multiple_sql_tables_using_Lookup_Op",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "copy files",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "pl_copy_files_wildcard_asterisk",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {}
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"ObjectType": {
+						"type": "string",
+						"defaultValue": "files"
+					}
+				},
+				"folder": {
+					"name": "IF_condition"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}

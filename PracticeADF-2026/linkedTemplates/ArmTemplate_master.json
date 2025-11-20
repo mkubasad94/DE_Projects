@@ -209,6 +209,26 @@
 			"dependsOn": [
 				"[resourceId('Microsoft.Resources/deployments', 'PracticeADF-2026_ArmTemplate_2')]"
 			]
+		},
+		{
+			"name": "PracticeADF-2026_ArmTemplate_4",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_4.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'PracticeADF-2026_ArmTemplate_3')]"
+			]
 		}
 	]
 }

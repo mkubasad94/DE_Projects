@@ -3849,6 +3849,82 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_script_activity')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Script",
+						"description": "",
+						"type": "Script",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "ls_sql_server",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"parameters": [
+										{
+											"name": "MinSalary",
+											"type": "Double",
+											"value": "10000",
+											"direction": "Input"
+										},
+										{
+											"name": "MaxSalary",
+											"type": "Double",
+											"value": "60000",
+											"direction": "Input"
+										}
+									],
+									"type": "Query",
+									"text": "print('start')\nSELECT * FROM [dbo].[employees] \nWHERE salary > @MinSalary AND salary < @MaxSalary\nprint('end')"
+								},
+								{
+									"parameters": [
+										{
+											"name": "Team",
+											"type": "String",
+											"value": "Rcb",
+											"direction": "Input"
+										}
+									],
+									"type": "Query",
+									"text": "SELECT * FROM [dbo].[iplteams] WHERE team = @Team"
+								},
+								{
+									"type": "NonQuery",
+									"text": "SELECT * INTO Demoiplteams FROM iplteams"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Validation_Script_N_WebActivity"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_sql_server')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/pl_until')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -4075,6 +4151,268 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/pl_validate_N_copy')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Validation_car_sales_files",
+						"type": "Validation",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "ds_validation",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"timeout": "00:05:00",
+							"sleep": 10,
+							"childItems": true
+						}
+					},
+					{
+						"name": "Copy files",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Validation_car_sales_files",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "Data_with_hierarchy",
+									"wildcardFileName": "*",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings",
+									"copyBehavior": "PreserveHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_validation",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_files_validation",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"folder": {
+					"name": "Validation_Script_N_WebActivity"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_validation')]",
+				"[concat(variables('factoryId'), '/datasets/ds_target_copy_files_validation')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pl_web_activity')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Web",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": "https://dummy.restapiexample.com/api/v1/employees"
+						}
+					},
+					{
+						"name": "Copy web data",
+						"type": "Copy",
+						"dependsOn": [
+							{
+								"activity": "Set webdata",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"additionalColumns": [
+									{
+										"name": "web_data",
+										"value": {
+											"value": "@variables('web_op')",
+											"type": "Expression"
+										}
+									}
+								],
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".json"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"name": "web_data",
+											"type": "String"
+										},
+										"sink": {
+											"type": "String",
+											"physicalType": "String",
+											"ordinal": 1
+										}
+									}
+								],
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "ds_dummy_for_web",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "ds_target_copy_web_data",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					},
+					{
+						"name": "Set webdata",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Web",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "web_op",
+							"value": {
+								"value": "@string(activity('Web').output)",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"variables": {
+					"web_op": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Validation_Script_N_WebActivity"
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_dummy_for_web')]",
+				"[concat(variables('factoryId'), '/datasets/ds_target_copy_web_data')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_copy_last_30min_old_files')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -4136,6 +4474,35 @@
 						"fileSystem": "source"
 					}
 				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_dummy_for_web')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "dummy_for_web.csv",
+						"folderPath": "Data_with_hierarchy",
+						"fileSystem": "source"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": false,
+					"quoteChar": "\""
+				},
+				"schema": []
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/ls_adls_gen2')]"
@@ -5047,6 +5414,34 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_target_copy_files_validation')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "copy_files/validation_N_copy",
+						"fileSystem": "target"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_gen2')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_target_copy_files_wildcard')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -5362,6 +5757,35 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/ds_target_copy_web_data')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "web_op.json",
+						"folderPath": "copy_files/web_output",
+						"fileSystem": "target"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "",
+					"firstRowAsHeader": false,
+					"quoteChar": ""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_gen2')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/ds_target_copyfiles_pass_multiple_values_from_1_activity')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -5386,6 +5810,34 @@
 						},
 						"folderPath": "copy_files/pass_mutliple_values",
 						"fileSystem": "target"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_adls_gen2')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_validation')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_adls_gen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "Data_with_hierarchy",
+						"fileSystem": "source"
 					},
 					"columnDelimiter": ",",
 					"escapeChar": "\\",
