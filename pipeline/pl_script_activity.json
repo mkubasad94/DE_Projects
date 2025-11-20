@@ -1,0 +1,68 @@
+{
+	"name": "pl_script_activity",
+	"properties": {
+		"activities": [
+			{
+				"name": "Script",
+				"description": "",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "ls_sql_server",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"parameters": [
+								{
+									"name": "MinSalary",
+									"type": "Double",
+									"value": "10000",
+									"direction": "Input"
+								},
+								{
+									"name": "MaxSalary",
+									"type": "Double",
+									"value": "60000",
+									"direction": "Input"
+								}
+							],
+							"type": "Query",
+							"text": "print('start')\nSELECT * FROM [dbo].[employees] \nWHERE salary > @MinSalary AND salary < @MaxSalary\nprint('end')"
+						},
+						{
+							"parameters": [
+								{
+									"name": "Team",
+									"type": "String",
+									"value": "Rcb",
+									"direction": "Input"
+								}
+							],
+							"type": "Query",
+							"text": "SELECT * FROM [dbo].[iplteams] WHERE team = @Team"
+						},
+						{
+							"type": "NonQuery",
+							"text": "SELECT * INTO Demoiplteams FROM iplteams"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"folder": {
+			"name": "Validation_Script_N_WebActivity"
+		},
+		"annotations": []
+	}
+}
