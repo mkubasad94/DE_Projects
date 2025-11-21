@@ -63,71 +63,46 @@
 										{
 											"source": {
 												"path": "id"
+											},
+											"sink": {
+												"name": "id",
+												"type": "Int64"
 											}
 										},
 										{
 											"source": {
 												"path": "email"
+											},
+											"sink": {
+												"name": "email",
+												"type": "String"
 											}
 										},
 										{
 											"source": {
 												"path": "first_name"
+											},
+											"sink": {
+												"name": "first_name",
+												"type": "String"
 											}
 										},
 										{
 											"source": {
 												"path": "last_name"
+											},
+											"sink": {
+												"name": "last_name",
+												"type": "String"
 											}
 										},
 										{
 											"source": {
-												"path": "$['data'][0]['avatar']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['support']['url']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['support']['text']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['_meta']['powered_by']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['_meta']['upgrade_url']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['_meta']['docs_url']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['_meta']['template_gallery']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['_meta']['message']"
-											}
-										},
-										{
-											"source": {
-												"path": "$['_meta']['features'][0]"
-											}
-										},
-										{
-											"source": {
-												"path": "$['_meta']['upgrade_cta']"
+												"path": "avatar"
+											},
+											"sink": {
+												"name": "avatar",
+												"type": "String"
 											}
 										}
 									],
