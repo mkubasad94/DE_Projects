@@ -3,6 +3,137 @@
 	"properties": {
 		"activities": [
 			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Web activity for pagecount",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@range(1,activity('Web activity for pagecount').output.total_pages)",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Copy web data with rest api",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"additionalHeaders": {
+										"x-api-key": "reqres-free-v1"
+									},
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "id"
+											},
+											"sink": {
+												"name": "id"
+											}
+										},
+										{
+											"source": {
+												"path": "email"
+											},
+											"sink": {
+												"name": "email"
+											}
+										},
+										{
+											"source": {
+												"path": "first_name"
+											},
+											"sink": {
+												"name": "first_name"
+											}
+										},
+										{
+											"source": {
+												"path": "last_name"
+											},
+											"sink": {
+												"name": "last_name"
+											}
+										},
+										{
+											"source": {
+												"path": "avatar"
+											},
+											"sink": {
+												"name": "avatar"
+											}
+										}
+									],
+									"collectionReference": "$['data']",
+									"mapComplexValuesToString": false
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_rest_api",
+									"type": "DatasetReference",
+									"parameters": {
+										"page_num": {
+											"value": "?page=@{item()}",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_target_rest_api_copy_web_data",
+									"type": "DatasetReference",
+									"parameters": {
+										"pagename": {
+											"value": "target_page_name_@{item()}.csv",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
 				"name": "Web activity for pagecount",
 				"type": "WebActivity",
 				"dependsOn": [],
