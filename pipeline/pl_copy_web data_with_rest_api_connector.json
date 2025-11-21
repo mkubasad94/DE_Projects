@@ -65,8 +65,7 @@
 												"path": "id"
 											},
 											"sink": {
-												"name": "id",
-												"type": "Int64"
+												"name": "id"
 											}
 										},
 										{
@@ -74,8 +73,7 @@
 												"path": "email"
 											},
 											"sink": {
-												"name": "email",
-												"type": "String"
+												"name": "email"
 											}
 										},
 										{
@@ -83,8 +81,7 @@
 												"path": "first_name"
 											},
 											"sink": {
-												"name": "first_name",
-												"type": "String"
+												"name": "first_name"
 											}
 										},
 										{
@@ -92,8 +89,7 @@
 												"path": "last_name"
 											},
 											"sink": {
-												"name": "last_name",
-												"type": "String"
+												"name": "last_name"
 											}
 										},
 										{
@@ -101,12 +97,11 @@
 												"path": "avatar"
 											},
 											"sink": {
-												"name": "avatar",
-												"type": "String"
+												"name": "avatar"
 											}
 										}
 									],
-									"collectionReference": "",
+									"collectionReference": "$['data']",
 									"mapComplexValuesToString": false
 								}
 							},
