@@ -73,7 +73,6 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"method": "GET",
 					"url": "https://reqres.in/api/users?page=1"
 				}
 			}
