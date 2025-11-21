@@ -16,7 +16,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"items": {
-						"value": "@range(1,2)\n",
+						"value": "@range(1,activity('Web activity for pagecount').output.total_pages)",
 						"type": "Expression"
 					},
 					"activities": [
@@ -38,11 +38,102 @@
 									"httpRequestTimeout": "00:01:40",
 									"requestInterval": "00.00:00:00.010",
 									"requestMethod": "GET",
+									"additionalHeaders": {
+										"x-api-key": "reqres-free-v1"
+									},
 									"paginationRules": {
 										"supportRFC5988": "true"
 									}
 								},
-								"enableStaging": false
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"mappings": [
+										{
+											"source": {
+												"path": "id"
+											}
+										},
+										{
+											"source": {
+												"path": "email"
+											}
+										},
+										{
+											"source": {
+												"path": "first_name"
+											}
+										},
+										{
+											"source": {
+												"path": "last_name"
+											}
+										},
+										{
+											"source": {
+												"path": "$['data'][0]['avatar']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['support']['url']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['support']['text']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['_meta']['powered_by']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['_meta']['upgrade_url']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['_meta']['docs_url']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['_meta']['template_gallery']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['_meta']['message']"
+											}
+										},
+										{
+											"source": {
+												"path": "$['_meta']['features'][0]"
+											}
+										},
+										{
+											"source": {
+												"path": "$['_meta']['upgrade_cta']"
+											}
+										}
+									],
+									"collectionReference": "",
+									"mapComplexValuesToString": false
+								}
 							},
 							"inputs": [
 								{
@@ -51,6 +142,18 @@
 									"parameters": {
 										"page_num": {
 											"value": "@item()",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_target_rest_api_copy_web_data",
+									"type": "DatasetReference",
+									"parameters": {
+										"pagename": {
+											"value": "target_page_name_@{item()}",
 											"type": "Expression"
 										}
 									}
@@ -73,6 +176,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
+					"method": "GET",
 					"headers": {
 						"x-api-key": "reqres-free-v1"
 					},
