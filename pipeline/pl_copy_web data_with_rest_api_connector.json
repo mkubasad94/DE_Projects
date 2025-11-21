@@ -116,7 +116,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"page_num": {
-											"value": "@item()",
+											"value": "?page=@{item()}",
 											"type": "Expression"
 										}
 									}
