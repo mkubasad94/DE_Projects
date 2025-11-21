@@ -128,7 +128,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"pagename": {
-											"value": "target_page_name_@{item()}",
+											"value": "target_page_name_@{item()}.csv",
 											"type": "Expression"
 										}
 									}
