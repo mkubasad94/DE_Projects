@@ -1,0 +1,15 @@
+%md
+####Notebook Name : 03-Ingest-Pricing-Reference-DB-Source-Data
+##### Source Table Details
+Source Tables:
+masterdata.market_address
+masterdata.country_profile
+masterdata.exchange_rates
+masterdata.domestic_product_codes
+masterdata.global_item_codes
+
+
+##### Source Tables Ingestion Path In Bronze Layer:
+ "abfss://bronze@datalakestorageaccountname.dfs.core.windows.net/reference-data/"
+
+

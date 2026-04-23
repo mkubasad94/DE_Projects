@@ -1,0 +1,9 @@
+JDBCconnectionUrl = "jdbc:sqlserver://<server>;encrypt=true;databaseName=<database>;user=<user>;password=<password>";
+
+Server -> asqludacoursesserver.database.windows.net
+
+databaseName -> asqludacourses
+
+user -> sourcereader
+
+password -> DBReader@2024
