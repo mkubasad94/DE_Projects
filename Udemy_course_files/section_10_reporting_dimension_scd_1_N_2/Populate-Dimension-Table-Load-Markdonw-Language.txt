@@ -1,0 +1,7 @@
+%md
+| SOURCE_TABLE_NAME | SOURCE_COLUMN_NAME | REPORTING_TABLE_NAME | REPORTING_COLUMN_NAME | TRANSFORMATION RULE | CONDITIONS |
+| --- | --- |--- | --- |--- |--- |
+| silver.daily_pricing_silver	| state_name	|***REPORTING_DIM_STATE_GOLD***	|***STATE_NAME***	| Select Unique state_name Values | Identify New/Changed Records From the Source Table . Use ***lakehouse_updated_date Column*** in source table to Identify New/Changed Records|
+| DERIVED	| DERIVED	|***REPORTING_DIM_STATE_GOLD***	| ***STATE_ID***	| Generate Running Sequnece ID For Each Unique state_name Values | 1. Make Sure No Duplicate State_Name Values Loaded 2.  When loading new State_Name values in subsquent run , STATE_ID values need to be generated on top of existing MAX(STATE_ID)   |
+| DERIVED	| DERIVED	|***REPORTING_DIM_STATE_GOLD***	| ***lakehouse_inserted_date***	| Load current_timestamp() | |
+| DERIVED	| DERIVED	|***REPORTING_DIM_STATE_GOLD***	| ***lakehouse_updated_date***	| Load current_timestamp() | |

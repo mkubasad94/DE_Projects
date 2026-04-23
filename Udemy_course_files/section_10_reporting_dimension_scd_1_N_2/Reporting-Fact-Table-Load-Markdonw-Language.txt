@@ -1,0 +1,14 @@
+%md
+| SOURCE_TABLE_NAME | SOURCE_COLUMN_NAME | REPORTING_TABLE_NAME | REPORTING_COLUMN_NAME | TRANSFORMATION RULE | CONDITIONS |
+| --- | --- |--- | --- |--- |--- |
+| silver.daily_pricing_silver	| DATE_OF_PRICING	|reporting_fact_daily_pricing_gold| DATE_ID| Lookup Source DATE_OF_PRICING value against CALENDAR_DATE value on reporting_dim_date_gold table and select DATE_ID | Identify New/Changed Records From the Source |
+| silver.daily_pricing_silver	| STATE_NAME	|reporting_fact_daily_pricing_gold| STATE_ID| Lookup Source STATE_NAME value against STATE_NAME value on reporting_dim_state_gold table and select STATE_ID |  |
+| silver.daily_pricing_silver	| MARKET_NAME	|reporting_fact_daily_pricing_gold| MARKET_ID| Lookup Source MARKET_NAME value against MARKET_NAME value on reporting_dim_market_gold table and select MARKET_ID |  |
+| silver.daily_pricing_silver	| PRODUCTGROUP_NAME , PRODUCT_NAME	|reporting_fact_daily_pricing_gold| PRODUCT_ID| Lookup Source PRODUCTGROUP_NAME and PRODUCT_NAME values against PRODUCTGROUP_NAME and PRODUCT_NAME values on reporting_dim_prduct_gold table and select PRODUCT_ID |  |
+| silver.daily_pricing_silver	| VARIETY	|reporting_fact_daily_pricing_gold| VARIETY_ID| Lookup Source VARIETY value against VARIETY value on reporting_dim_variety_gold table and select VARIETY_ID |  |
+| silver.daily_pricing_silver	| ROW_ID	|reporting_fact_daily_pricing_gold| ROW_ID| Direct Mapping |  |
+| silver.daily_pricing_silver	| ARRIVAL_IN_TONNES	|reporting_fact_daily_pricing_gold| ARRIVAL_IN_TONNES| Direct Mapping |  |
+| silver.daily_pricing_silver	| MINIMUM_PRICE	|reporting_fact_daily_pricing_gold| MINIMUM_PRICE| Direct Mapping |  |
+| silver.daily_pricing_silver	| MAXIMUM_PRICE	|reporting_fact_daily_pricing_gold| MAXIMUM_PRICE| Direct Mapping |  |
+| silver.daily_pricing_silver	| MODAL_PRICE	|reporting_fact_daily_pricing_gold| MODAL_PRICE| Direct Mapping |  |
+| DERIVED	| DERIVED	|reporting_fact_daily_pricing_gold	| lakehouse_inserted_date	| Load current_timestamp() | |
