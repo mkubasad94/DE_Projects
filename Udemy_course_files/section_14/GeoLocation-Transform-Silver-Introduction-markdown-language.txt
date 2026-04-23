@@ -1,0 +1,3 @@
+%md
+GeoLocation JSON Source File Path : "abfss://bronze@datalakestorageaccountname.dfs.core.windows.net/geo-location/
+"
