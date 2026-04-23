@@ -1,0 +1,12 @@
+%md
+####Notebook Name : 01-Transform-Daily-Pricing-CSV-to-DELTA-Table
+##### Source Table Details
+Source Table Name : pricing_analytics.bronze.daily_pricing
+Source Table New/Changed-Records Identification Column : source_file_load_date
+
+##### Target Table Details
+Target Table Name : pricing_analytics.silver.daily_pricing_silver
+
+
+##### Processrunlogs Table For Incremental Load
+Processrunlogs Table Name : pricing_analytics.processrunlogs.DELTALAKEHOUSE_PROCESS_RUNS
