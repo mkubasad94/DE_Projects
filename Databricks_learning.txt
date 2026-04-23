@@ -1,0 +1,70 @@
+Delta live tables	--> only available in databricks
+	cant run in notebook, it is just declaring steps to perform because when performing transformation we are just declaring the steps, to run this code we need to run additional delta live table pipeline to run this code. this framework is called declarative framework
+	It can orchestrate code inside notebook automatically, it manages the cluster automatically like creating and deleting it.
+	During run, it automatically monitor the job runs.
+	It also offers features like 
+		AUTOLOADER which automatically detect new files in source, APPLY CHANGES using which we can also do CDC on our target tables.
+	
+	DLT can be created using 3 types of datasets
+		1.	Streaming tables -- ideal choice for live data, it uses AUTOLOADER feature to identify new chamge in source and process it only once.
+		2. 	Matereliased view -- this is ideal for the cases like we process once and is used multiple users and processes.ex: in our gold layer for reporting, we created dim and fact tables, so once we create materialised view on these tables, it can be used by multiple users.
+		3. Views -- here we are just referring delta live table or materialised view to fetch data. ideal when we want to provide or restrict the access to all data in a table/tables also can be used to reduce the complexity of a query
+	
+decorator
+@dlt.table --> for both materialised view and table
+fn name is going to be delta live table, we can rename it as well using name property of dlt.table decorator.
+once created the code, we cant run it, so we need to create pipeline to run it and also establish connection between source and cluster created in databricks to run the pipeline  
+
+Auto loader performs incremental ingestion of the source data arrived into the cloud storages.
+if we pass the name for @dlt.table decorator, it will be used as dlt name not the one used for defining function
+@dlt.table(name='dlt_name')
+def fnName():
+	return ( code block )
+	
+Use .format("cloudFiles") to enable autoloader functionality in dlt, it will automatically detect the changes and do incremental
+After loading first set of the files, it will create the checkpoint location automatically.
+auto loader it automatically persist them, The list of files arrived into the source location as a key value store in the Rocksdb.
+It uses that one to identify new files, and it starts to process as soon as the new files are saved into our source location.
+In case of failure, Auto loader can automatically resume from where it left.
+It's really, really very efficient on the ingestion side. We don't need to do much coding as well. If you look at it, the only thing we need to mention is format cloud files.
+
+create DL table from existing DL table
+to create 
+pyspark
+	@dlt.table
+	def fn_or_tablename():
+		return(dlt.read_stream("tablename")
+		)
+Using SQL
+	@dlt.table
+	def fn_or_tablename():
+		return(
+		spark.sql("""select * from live.tbl_name""")
+	-- Here live keyword has to be used as we are accessing DL table
+
+table or materialised view creation depends on the statement or code we use in return statement
+if we use, 
+"read_stream" --> creates streaming live table
+"read_table" or other than stream --> creates materialised view
+
+Data quality checks 
+we need to provide data quality checks in dictionary as key valu pairs and pass it to 
+@dlt.expect_all_or_drop() decorator like
+
+dq_rules = {"Valid_date":"Datetime_col is Not Null"}
+@dlt.table
+@dlt.expect_all_or_drop(dq_rules) 
+def dlt_tbl_name():
+	return(
+	dlt.read_stream("tblName").dropDuplicates(["col1","col2"])
+	)
+	
+Automated Change Data Capture using Apply Changes API
+
+
+
+
+
+		
+		
+	
