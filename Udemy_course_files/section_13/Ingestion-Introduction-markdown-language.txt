@@ -1,0 +1,5 @@
+%md
+source API URL : "https://geocoding-api.open-meteo.com/v1/search?name=kovilpatti&count=10&language=en&format=json"
+
+JSON Target File Path : "abfss://working-labs@datalakestorageaccountname.dfs.core.windows.net/bronze/geo-location/
+"
